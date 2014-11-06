@@ -1,0 +1,29 @@
+a minimalist /sbin/init for Docker, only reap childrens and propagate SIGTERM
+
+h1. Usage
+
+Just put at the end of your _"CMD"_ (a shell script executed by _/bin/sh_ ?) into your Docker PID 1 process:
+<pre>
+exec /sbin/flex-docker-init
+</pre>
+
+h1. Example
+
+Your Dockerfile should looks like:
+<pre>
+FROM whatever
+
+[...]
+
+COPY /opt/flex_docker_init/flex-docker-init /sbin/flex-docker-init
+[...]
+
+CMD ["/bin/sh", "/etc/rc.local.flex-docker"]
+</pre>
+
+And of course the end of _"/etc/rc.local.flex-docker"_ should contains:
+<pre>
+[...]
+
+exec /sbin/flex-docker-init
+</pre>
