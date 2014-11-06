@@ -16,14 +16,23 @@ FROM whatever
 [...]
 
 COPY /opt/flex_docker_init/flex-docker-init /sbin/flex-docker-init
+# OR
+ADD http://localhost/path/to/flex_docker_init/flex-docker-init /sbin/flex-docker-init
 [...]
 
 CMD ["/bin/sh", "/etc/rc.local.flex-docker"]
 </pre>
 
-And of course the end of _"/etc/rc.local.flex-docker"_ should contains:
+And of course the end of _"/etc/rc.local.flex-docker"_ (your /sbin/init equivalent, PID 1) should contains, for example:
 <pre>
+#!/bin/sh
+
+/usr/sbin/sshd
+/usr/sbin/cron
+[...]
+daemon -- /whatever/binary/to/daemonize
 [...]
 
+chmod +x /sbin/flex-docker-init
 exec /sbin/flex-docker-init
 </pre>
