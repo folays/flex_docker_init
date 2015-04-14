@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <time.h>
+#include <unistd.h>
 
 #define FLEX_TERM_WAIT_TIME 5
 
@@ -44,10 +45,26 @@ static void signal_chld(int sig)
   // exists only so that sleep(1) is awaken as soon as a children needs to be reap.
 }
 
+static void run_rc(void)
+{
+  int pid;
+
+  if ((pid = fork()) < 0)
+    err(1, "fork");
+
+  if (pid)
+    return;
+
+  execl("/bin/sh", "/bin/sh", "/etc/rc.local.flex-docker", NULL);
+  exit(0); /* if the rc file doesn't exist */
+}
+
 int main(int argc, char **argv)
 {
   signal(SIGTERM, signal_term);
   signal(SIGCHLD, signal_chld);
+
+  run_rc();
 
   while (1)
     {
