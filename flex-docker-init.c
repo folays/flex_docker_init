@@ -45,7 +45,7 @@ static void signal_chld(int sig)
   // exists only so that sleep(1) is awaken as soon as a children needs to be reap.
 }
 
-static void run_rc(void)
+static void run_rc(int argc, char **argv)
 {
   int pid;
 
@@ -55,7 +55,23 @@ static void run_rc(void)
   if (pid)
     return;
 
-  execl("/bin/sh", "/bin/sh", "/etc/rc.local.flex-docker", NULL);
+  char **argv_new;
+  {
+    int i;
+
+    argv_new = calloc(argc + 1 + 1, sizeof(*argv_new));
+    if (!argv_new)
+      err(1, "calloc");
+
+    argv_new[0] = "/bin/sh";
+    argv_new[1] = "/etc/rc.local.flex-docker";
+    for (i = 1; i <= argc; ++i)
+      {
+	argv_new[i + 1] = argv[i];
+      }
+  }
+
+  execv(argv_new[0], argv_new);
   exit(0); /* if the rc file doesn't exist */
 }
 
@@ -64,7 +80,7 @@ int main(int argc, char **argv)
   signal(SIGTERM, signal_term);
   signal(SIGCHLD, signal_chld);
 
-  run_rc();
+  run_rc(argc, argv);
 
   while (1)
     {
