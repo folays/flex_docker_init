@@ -1,0 +1,24 @@
+#!/bin/sh
+
+/usr/sbin/sshd
+
+params="$(getopt -s sh -o +a --longoptions auto -- "$@")" || exit 1
+eval set -- "$params"
+
+while true; do
+    case "$1" in
+	-a|--auto)
+	    auto=y
+	    shift 1
+	    ;;
+	--)
+	    shift
+	    break
+	    ;;
+    esac
+done
+
+if [ X"$auto" = X"y" ]; then
+  echo AUTO
+  [ -e "/etc/rc.local.auto" ] && /bin/sh /etc/rc.local.auto
+fi
