@@ -77,6 +77,9 @@ static void run_rc(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+  if (chdir("/") != 0)
+    err(1, "chdir");
+
   signal(SIGTERM, signal_term);
   signal(SIGCHLD, signal_chld);
 
